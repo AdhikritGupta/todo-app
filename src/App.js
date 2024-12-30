@@ -3,6 +3,7 @@ import './App.css';
 // import { Component } from 'react';
 // import LearningComponent from './components/learning-examples/LearningComponent';
 import Counter from './components/counter/Counter';
+import TodoApp from './components/todo/TodoApp';
 
 function App() {
 
@@ -10,7 +11,7 @@ function App() {
   return (
     <div className="App">
           Learn React
-          <Counter/>
+          <TodoApp/>
     </div>
   );
 }
