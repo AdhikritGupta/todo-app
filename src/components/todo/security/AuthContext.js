@@ -1,8 +1,7 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { apiClient } from "../api/ApiClient";
 import { executeJwtAuthenticationService, executeDeleteAccount, executeRegister } from "../api/AuthenticationApiService";
-import { TotalTodos } from "../ListTodosComponent";
-import {deleteTodoApi} from "../api/TodoApiService";
+import { retrieveAllTodosForUsernameApi } from "../api/TodoApiService";
 
 //1: Create a Context
 export const AuthContext = createContext()
@@ -26,6 +25,39 @@ export default function AuthProvider({ children }) {
 
     const [token, setToken] = useState(null)
 
+    const [todos, setTodos] = useState(false);
+
+    useEffect(() => {
+        if(isAuthenticated && username) {
+            refreshTodos();
+        }
+    }, [isAuthenticated, username]);
+
+    async function refreshTodos() {
+        try {
+            const response = await retrieveAllTodosForUsernameApi(username);
+            const todosPresent = response.data.length > 0;
+            setTodos(todosPresent);
+            console.log(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    
+
+    async function refreshTodosDirect() {
+        try {
+            const response = await retrieveAllTodosForUsernameApi(username);
+            const todosPresent = response.data.length > 0;
+            setTodos(todosPresent); // Update state for consistency
+            return todosPresent;
+        } catch (error) {
+            console.error('Error refreshing todos:', error);
+            return false;
+        }
+    }
+    
+    
 
     async function login(username, password) {
 
@@ -75,7 +107,13 @@ export default function AuthProvider({ children }) {
         }
     }
 
+
     async function deleteAccount() {
+        // Refresh todos and retrieve the result directly
+        const todosPresent = await refreshTodosDirect();
+    
+        console.log('Todos:', todosPresent);
+    
         if (!token || !username) {
             console.error('User is not authenticated or username is missing');
             return false;
@@ -88,10 +126,9 @@ export default function AuthProvider({ children }) {
         }
     
         try {
-            console.log('Todos:', TotalTodos)
-            if(TotalTodos == null || TotalTodos.length == 0){
-                alert('Please delete all the todos before deleting the account')
-                throw new Error('Please delete all the todos before deleting the account')
+            if (todosPresent) {
+                alert('Please delete all the todos before deleting the account');
+                throw new Error('Please delete all the todos before deleting the account');
             }
             const response = await executeDeleteAccount(username, password);
             if (response.status === 200) {
@@ -107,6 +144,7 @@ export default function AuthProvider({ children }) {
             return false;
         }
     }
+    
     
 
     function logout() {
