@@ -1,6 +1,8 @@
 import { createContext, useContext, useState } from "react";
 import { apiClient } from "../api/ApiClient";
 import { executeJwtAuthenticationService, executeDeleteAccount, executeRegister } from "../api/AuthenticationApiService";
+import { TotalTodos } from "../ListTodosComponent";
+import {deleteTodoApi} from "../api/TodoApiService";
 
 //1: Create a Context
 export const AuthContext = createContext()
@@ -24,50 +26,6 @@ export default function AuthProvider({ children }) {
 
     const [token, setToken] = useState(null)
 
-    // function login(username, password) {
-    //     if(username==='adhikrit' && password==='dummy'){
-    //         setAuthenticated(true)
-    //         setUsername(username)
-    //         return true            
-    //     } else {
-    //         setAuthenticated(false)
-    //         setUsername(null)
-    //         return false
-    //     }          
-    // }
-
-    // async function login(username, password) {
-
-    //     const baToken = 'Basic ' + window.btoa( username + ":" + password )
-
-    //     try {
-
-    //         const response = await executeBasicAuthenticationService(baToken)
-
-    //         if(response.status==200){
-    //             setAuthenticated(true)
-    //             setUsername(username)
-    //             setToken(baToken)
-
-    //             apiClient.interceptors.request.use(
-    //                 (config) => {
-    //                     console.log('intercepting and adding a token')
-    //                     config.headers.Authorization = baToken
-    //                     return config
-    //                 }
-    //             )
-
-    //             return true            
-    //         } else {
-    //             logout()
-    //             return false
-    //         }    
-    //     } catch(error) {
-    //         logout()
-    //         return false
-    //     }
-    // }
-
 
     async function login(username, password) {
 
@@ -85,7 +43,7 @@ export default function AuthProvider({ children }) {
 
                 apiClient.interceptors.request.use(
                     (config) => {
-                        console.log('intercepting and adding a token')
+                        // console.log('intercepting and adding a token')
                         config.headers.Authorization = jwtToken
                         return config
                     }
@@ -117,21 +75,25 @@ export default function AuthProvider({ children }) {
         }
     }
 
-    async function deleteAccount(password) {
+    async function deleteAccount() {
         if (!token || !username) {
             console.error('User is not authenticated or username is missing');
             return false;
         }
     
-        // const password = prompt('Please enter your password to confirm account deletion:', '');
+        const password = prompt('Please enter your password to confirm account deletion:', '');
         if (!password) {
             console.error('Password is required to delete the account');
             return false;
         }
     
         try {
+            console.log('Todos:', TotalTodos)
+            if(TotalTodos == null || TotalTodos.length == 0){
+                alert('Please delete all the todos before deleting the account')
+                throw new Error('Please delete all the todos before deleting the account')
+            }
             const response = await executeDeleteAccount(username, password);
-    
             if (response.status === 200) {
                 console.log('Account deleted successfully');
                 logout(); // Clear authentication state after account deletion

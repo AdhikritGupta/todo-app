@@ -18,9 +18,9 @@ function HeaderComponent() {
         navigate(`/welcome/${username}`)
     }
 
-    // function deleteUser(password) {
-    //     authContext.deleteAccount(password)
-    // }
+    function deleteAccount() {
+        authContext.deleteAccount();
+    }
     function createAccount() {
         console.log('create account')
         navigate('/register')
@@ -50,7 +50,7 @@ function HeaderComponent() {
                                 </li>
                                 <li className="nav-item">
                                 {isAuthenticated &&
-                                    <Link className="nav-link" to="/password-prompt">Delete Account</Link>}
+                                    <button className="nav-link" onClick={deleteAccount}>Delete Account</button>}
                                 </li>
                             </ul>
                         </div>

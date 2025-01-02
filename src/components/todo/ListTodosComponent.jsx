@@ -4,6 +4,9 @@ import { retrieveAllTodosForUsernameApi, deleteTodoApi } from "./api/TodoApiServ
 import { useAuth } from "./security/AuthContext"
 import './HeaderComponent.css'
 
+export function TotalTodos(todos) {
+    return todos.length
+}
 
 function ListTodosComponent() {
 
