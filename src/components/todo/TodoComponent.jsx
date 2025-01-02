@@ -56,9 +56,12 @@ export default function TodoComponent() {
         } else {
             updateTodoApi(username, id, todo)
             .then(response => {
+                
                 navigate('/todos')
             })
             .catch(error => console.log(error))
+            
+            
         }
     }
 

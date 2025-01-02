@@ -29,11 +29,11 @@ function LoginComponent() {
             setShowErrorMessage(true)
         }
     }
-
+   
     return (
         <div className="Login">
             <h1>Time to Login!</h1>
-            {showErrorMessage && <div className="errorMessage">Authentication Failed. 
+            {showErrorMessage && <div className="error-message">Authentication Failed. 
                                                             Please check your credentials.</div>}
             <div className="LoginForm">
                 <div>
@@ -45,7 +45,7 @@ function LoginComponent() {
                     <input type="password" name="password" value={password} onChange={handlePasswordChange}/>
                 </div>
                 <div>
-                    <button type="button" name="login" onClick={handleSubmit}>login</button>
+                    <button type="button" name="login" className="custom-button" onClick={handleSubmit}>Login</button>
                 </div>
             </div>
         </div>

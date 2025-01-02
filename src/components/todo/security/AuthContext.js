@@ -7,6 +7,13 @@ export const AuthContext = createContext()
 
 export const useAuth = () => useContext(AuthContext)
 
+export const useAuthenticated = () => {
+    return useAuth().isAuthenticated
+}
+
+export const useUsername = () => {
+    return useAuth().username
+}
 //2: Share the created context with other components
 export default function AuthProvider({ children }) {
 
@@ -17,17 +24,17 @@ export default function AuthProvider({ children }) {
 
     const [token, setToken] = useState(null)
 
-    function login(username, password) {
-        if(username==='adhikrit' && password==='dummy'){
-            setAuthenticated(true)
-            setUsername(username)
-            return true            
-        } else {
-            setAuthenticated(false)
-            setUsername(null)
-            return false
-        }          
-    }
+    // function login(username, password) {
+    //     if(username==='adhikrit' && password==='dummy'){
+    //         setAuthenticated(true)
+    //         setUsername(username)
+    //         return true            
+    //     } else {
+    //         setAuthenticated(false)
+    //         setUsername(null)
+    //         return false
+    //     }          
+    // }
 
     // async function login(username, password) {
 
@@ -62,38 +69,38 @@ export default function AuthProvider({ children }) {
     // }
 
 
-    // async function login(username, password) {
+    async function login(username, password) {
 
-    //     try {
+        try {
 
-    //         const response = await executeJwtAuthenticationService(username, password)
+            const response = await executeJwtAuthenticationService(username, password)
 
-    //         if(response.status==200){
+            if(response.status==200){
                 
-    //             const jwtToken = 'Bearer ' + response.data.token
+                const jwtToken = 'Bearer ' + response.data.token
                 
-    //             setAuthenticated(true)
-    //             setUsername(username)
-    //             setToken(jwtToken)
+                setAuthenticated(true)
+                setUsername(username)
+                setToken(jwtToken)
 
-    //             apiClient.interceptors.request.use(
-    //                 (config) => {
-    //                     console.log('intercepting and adding a token')
-    //                     config.headers.Authorization = jwtToken
-    //                     return config
-    //                 }
-    //             )
+                apiClient.interceptors.request.use(
+                    (config) => {
+                        console.log('intercepting and adding a token')
+                        config.headers.Authorization = jwtToken
+                        return config
+                    }
+                )
 
-    //             return true            
-    //         } else {
-    //             logout()
-    //             return false
-    //         }    
-    //     } catch(error) {
-    //         logout()
-    //         return false
-    //     }
-    // }
+                return true            
+            } else {
+                logout()
+                return false
+            }    
+        } catch(error) {
+            logout()
+            return false
+        }
+    }
 
 
     function logout() {

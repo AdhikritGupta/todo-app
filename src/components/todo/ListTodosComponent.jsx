@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react"
-import {useNavigate} from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { retrieveAllTodosForUsernameApi, deleteTodoApi } from "./api/TodoApiService"
 import { useAuth } from "./security/AuthContext"
+import './HeaderComponent.css'
+
 
 function ListTodosComponent() {
 
@@ -11,41 +13,36 @@ function ListTodosComponent() {
 
     const username = authContext.username
 
+    const location = useLocation()
+
     const navigate = useNavigate()
-    
-    const targetDate = new Date(today.getFullYear()+12, today.getMonth(), today.getDay())
 
-    const [todos,setTodos] = useState([])
-
-    const [message,setMessage] = useState(null)
+    const targetDate = new Date(today.getFullYear() + 12, today.getMonth(), today.getDay())
     
-    useEffect ( () => refreshTodos(), [])
+    const [message, setMessage] = useState(location.state?.message || null);
+
+
+    const [todos, setTodos] = useState([])
+
+    useEffect(() => refreshTodos(), [])
 
     function refreshTodos() {
-        
         retrieveAllTodosForUsernameApi(username)
-        .then(response => {
-            setTodos(response.data)
-        }
-            
-        )
-        .catch(error => console.log(error))
-    
+            .then(response => {
+                setTodos(response.data)
+                console.log(response.data)
+            })
+            .catch(error => console.log(error))
     }
 
-    function deleteTodo(id) {
+    function deleteTodo(id, description) {
         console.log('clicked ' + id)
         deleteTodoApi(username, id)
-        .then(
-
-            () => {
-                setMessage(`Delete of todos with id = ${id} successful`)
+            .then(() => {
+                setMessage(`Successfully deleted task: ${description}`)
                 refreshTodos()
-            }
-            //1: Display message
-            //2: Update Todos list
-        )
-        .catch(error => console.log(error))
+            })
+            .catch(error => console.log(error))
     }
 
     function updateTodo(id) {
@@ -60,40 +57,52 @@ function ListTodosComponent() {
     return (
         <div className="container">
             <h1>Things You Want To Do!</h1>
-            
-            {message && <div className="alert alert-warning">{message}</div>}
 
-            
+            {message && <div className="alert-greener">{message}</div>}
+
             <div>
                 <table className="table">
                     <thead>
-                            <tr>
-                                <th>Description</th>
-                                <th>Is Done?</th>
-                                <th>Target Date</th>
-                                <th>Delete</th>
-                                <th>Update</th>
-                            </tr>
+                        <tr>
+                            <th>Description</th>
+                            <th>Is Done?</th>
+                            <th>Target Date</th>
+                            <th>Delete</th>
+                            <th>Update</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    {
-                        todos.map(
-                            todo => (
-                                <tr key={todo.id}>
-                                    <td>{todo.description}</td>
-                                    <td>{todo.done.toString()}</td>
-                                    {/* <td>{todo.targetDate.toDateString()}</td> */}
-                                    <td>{todo.targetDate.toString()}</td>
-                                    <td> <button className="btn btn-warning" 
-                                                    onClick={() => deleteTodo(todo.id)}>Delete</button> </td>
-                                    <td> <button className="btn btn-success" 
-                                                    onClick={() => updateTodo(todo.id)}>Update</button> </td>
+                        {
+                            todos.length > 0 ? (
+                                todos.map(todo => (
+                                    <tr key={todo.id}>
+                                        <td>{todo.description}</td>
+                                        <td>{todo.done.toString()}</td>
+                                        <td>{todo.targetDate.toString()}</td>
+                                        <td>
+                                            <button
+                                                className="btn btn-danger"
+                                                onClick={() => {
+                                                    if (window.confirm('Are you sure you want to delete this task?')) {
+                                                        deleteTodo(todo.id, todo.description);
+                                                    }
+                                                }}
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button className="btn btn-success" onClick={() => updateTodo(todo.id)}>Update</button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="text-center table-warning">No Tasks Found</td>
                                 </tr>
                             )
-                        )
-                    }
+                        }
                     </tbody>
-
                 </table>
             </div>
             <div className="btn btn-success m-5" onClick={addNewTodo}>Add New Todo</div>
