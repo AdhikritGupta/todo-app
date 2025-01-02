@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import { apiClient } from "../api/ApiClient";
-import { executeJwtAuthenticationService } from "../api/AuthenticationApiService";
+import { executeJwtAuthenticationService, executeDeleteAccount, executeRegister } from "../api/AuthenticationApiService";
 
 //1: Create a Context
 export const AuthContext = createContext()
@@ -73,7 +73,7 @@ export default function AuthProvider({ children }) {
 
         try {
 
-            const response = await executeJwtAuthenticationService(username, password)
+            const response = await executeJwtAuthenticationService(username, password, token)
 
             if(response.status==200){
                 
@@ -102,6 +102,50 @@ export default function AuthProvider({ children }) {
         }
     }
 
+    async function register(username, password) {
+        try {
+            const response = await executeRegister(username, password);
+            if (response.status === 200) {
+                return await login(username, password);
+            } else {
+                console.error('Failed to register user');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error registering user:', error);
+            return false;
+        }
+    }
+
+    async function deleteAccount(password) {
+        if (!token || !username) {
+            console.error('User is not authenticated or username is missing');
+            return false;
+        }
+    
+        // const password = prompt('Please enter your password to confirm account deletion:', '');
+        if (!password) {
+            console.error('Password is required to delete the account');
+            return false;
+        }
+    
+        try {
+            const response = await executeDeleteAccount(username, password);
+    
+            if (response.status === 200) {
+                console.log('Account deleted successfully');
+                logout(); // Clear authentication state after account deletion
+                return true;
+            } else {
+                console.error('Failed to delete account');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error deleting account:', error);
+            return false;
+        }
+    }
+    
 
     function logout() {
         setAuthenticated(false)
@@ -110,7 +154,7 @@ export default function AuthProvider({ children }) {
     }
 
     return (
-        <AuthContext.Provider value={ {isAuthenticated, login, logout, username, token}  }>
+        <AuthContext.Provider value={ {isAuthenticated, login, logout, deleteAccount,register , username, token}  }>
             {children}
         </AuthContext.Provider>
     )

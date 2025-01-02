@@ -18,6 +18,14 @@ function HeaderComponent() {
         navigate(`/welcome/${username}`)
     }
 
+    // function deleteUser(password) {
+    //     authContext.deleteAccount(password)
+    // }
+    function createAccount() {
+        console.log('create account')
+        navigate('/register')
+    }
+
     return (
 
         <header className="border-bottom border-light border-5 mb-5 p-2">
@@ -36,6 +44,14 @@ function HeaderComponent() {
                                     {isAuthenticated
                                         && <Link className="nav-link" to="/todos">Todos</Link>}
                                 </li>
+                                <li className="nav-item">
+                                    {!isAuthenticated &&
+                                        <button className="nav-link btn" onClick={createAccount}>Create Account</button>}
+                                </li>
+                                <li className="nav-item">
+                                {isAuthenticated &&
+                                    <Link className="nav-link" to="/password-prompt">Delete Account</Link>}
+                                </li>
                             </ul>
                         </div>
                         <ul className="navbar-nav">
@@ -51,6 +67,7 @@ function HeaderComponent() {
                                 {isAuthenticated &&
                                     <Link className="nav-link" to="/logout" onClick={logout}>Logout</Link>}
                             </li>
+                            
 
                         </ul>
                     </nav>

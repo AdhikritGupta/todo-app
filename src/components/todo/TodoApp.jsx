@@ -6,7 +6,9 @@ import ErrorComponent from './ErrorComponent'
 import WelcomeComponent from './WelcomeComponent'
 import LoginComponent from './LoginComponent'
 import TodoComponent from './TodoComponent'
+import RegisterComponent from './RegisterComponent'
 import AuthProvider, { useAuth } from './security/AuthContext'
+import PasswordPrompt from './PasswordPrompt'
 
 import './TodoApp.css'
 import FooterComponent from './FooterComponent'
@@ -29,7 +31,12 @@ export default function TodoApp() {
                     <Routes>
                         <Route path='/' element={<LoginComponent />} />
                         <Route path='/login' element={<LoginComponent />} />
-
+                        <Route path='/register' element={<RegisterComponent />} />
+                        <Route path='/password-prompt' element={
+                            <AuthenticatedRoute>
+                                <PasswordPrompt />
+                            </AuthenticatedRoute>
+                            } />
                         <Route path='/welcome/:username' element={
                             <AuthenticatedRoute>
                                 <WelcomeComponent />
